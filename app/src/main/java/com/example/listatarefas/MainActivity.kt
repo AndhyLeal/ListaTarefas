@@ -28,6 +28,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btRemove: Button
     private lateinit var tarefas: ArrayList<String>
     private lateinit var adapter: ArrayAdapter<String>
+    private var selectedItemIndex: Int = -1 // Para armazenar o índice do item selecionado
+
 
     private val PREFS_NAME = "TarefasPrefs"
     private val KEY_TAREFAS = "tarefas"
@@ -74,14 +76,14 @@ class MainActivity : AppCompatActivity() {
             val tarefa = txtTarefa.text.toString()
 
             if (tarefa.isNotEmpty()) {
-                tarefas.add(tarefa + " ID: " + contador) // Adiciona a nova tarefa ao ArrayList
+                tarefas.add(" ID: $contador | $tarefa" ) // Adiciona a nova tarefa ao ArrayList
                 adapter.notifyDataSetChanged() // Atualiza a ListView
                 txtTarefa.setText("") // Limpa o campo de texto após adicionar
                 saveTarefas() // Salva a lista atualizada
             }
         }
 
-        // Configurando o botão "Remover"
+        /* Configurando o botão "Remover"
         btRemove.setOnClickListener{
              val idRemover = txtTarefa.text.toString()
              val removerTaf = tarefas.find { it.contains("ID: $idRemover" ) }
@@ -90,7 +92,24 @@ class MainActivity : AppCompatActivity() {
             adapter.notifyDataSetChanged() // Atualiza a ListView
             saveTarefas() // Salva a lista atualizada
             saveContador() //Salva o contador atualizado
+        }*/
+
+        // Configurando o clique nos itens da lista
+        listView.setOnItemClickListener { _, _, position, _ ->
+            selectedItemIndex = position // Armazena o índice do item selecionado
+            tarefas[position] // Exibe o item selecionado no campo de texto
         }
+
+        // Configurando o botão "Remover"
+        btRemove.setOnClickListener {
+            if (selectedItemIndex != -1) {
+                tarefas.removeAt(selectedItemIndex) // Remove o item selecionado
+                adapter.notifyDataSetChanged() // Atualiza a ListView
+                saveTarefas() // Salva a lista atualizada
+                selectedItemIndex = -1 // Reseta o índice do item selecionado
+            }
+        }
+
     }
 
     private fun saveTarefas() {
